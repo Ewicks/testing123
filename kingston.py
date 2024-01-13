@@ -8,7 +8,8 @@ import re
 import time
 import pprint
 
-wordlist = ['loft','ground','rear', 'erection']
+wordlist = ['rear']
+# wordlist = ['loft','ground','rear', 'erection']
 
 def convert(s):
  
@@ -74,11 +75,13 @@ for row in rowList:
     # Now, you can perform actions on the found element
     # For example, click the link
     element.click()
+    driver.execute_script("window.scrollTo(0, window.scrollY + 300);")
     wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_element_located((By.ID, 'subtab_details')))
 
     subtab = driver.find_element(By.ID, 'subtab_details')
     subtab.click()
+    driver.execute_script("window.scrollTo(0, window.scrollY + 320);")
 
     wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'row0')))
