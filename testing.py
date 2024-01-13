@@ -8,6 +8,7 @@ import time
 import pprint
 
 addressList = []
+nameList = []
 
 # Set up the WebDriver (you may need to provide the path to your chromedriver executable)
 driver = webdriver.Chrome()
@@ -59,8 +60,8 @@ for test1 in testing:
         name_soup = BeautifulSoup(name_page_source, 'html.parser')
         name_row = name_soup.find('tr', class_='row0')
         name = name_row.find('td')
-
-        print(name)
+        nameList.append(name.text.strip())
+        print(nameList)
         driver.back()
         driver.back()
         driver.execute_script("location.reload(true);")
