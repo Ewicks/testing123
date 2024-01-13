@@ -8,7 +8,7 @@ import re
 import time
 import pprint
 
-wordlist = ['loft','ground','test']
+wordlist = ['loft','ground','rear']
 
 def convert(s):
  
@@ -66,7 +66,7 @@ for row in searchResults:
         
 
    
-for x in rowList:
+for row in rowList:
     a_tag = row.find('a')
     link_text = a_tag.get_text(strip=True)
     element = driver.find_element(By.LINK_TEXT, link_text)
