@@ -4,9 +4,30 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+import re
 import time
 import pprint
 
+wordlist = ['loft','ground','test']
+
+def convert(s):
+ 
+    # initialization of string to ""
+    new = ""
+ 
+    # traverse in the string
+    for x in s:
+        new = new + x + '|'
+ 
+    # return string
+    return new
+
+words = convert(wordlist)
+words_search_for = words.rstrip(words[-1])
+print(words_search_for)
+
+
+rowList = []
 addressList = []
 nameList = []
 
@@ -35,36 +56,41 @@ page_source = driver.page_source
 # Parse HTML with BeautifulSoup
 soup = BeautifulSoup(page_source, 'html.parser')
 
-sections = soup.find('div', class_='col-a')
-testing = sections.find_all('li', class_='searchresult')
+searchResultsPage = soup.find('div', class_='col-a')
+searchResults = searchResultsPage.find_all('li', class_='searchresult')
 
-for test1 in testing:
-    a_tag = test1.find('a')
+for row in searchResults:
 
-    if a_tag:
-        link_text = a_tag.get_text(strip=True)
-        element = driver.find_element(By.LINK_TEXT, link_text)
+    if (re.search(words_search_for, row.text, flags=re.I)):
+        rowList.append(row)
+        
 
-        # Now, you can perform actions on the found element
-        # For example, click the link
-        element.click()
-        wait = WebDriverWait(driver, 10)
-        wait.until(EC.presence_of_element_located((By.ID, 'subtab_details')))
+   
+for x in rowList:
+    a_tag = row.find('a')
+    link_text = a_tag.get_text(strip=True)
+    element = driver.find_element(By.LINK_TEXT, link_text)
 
-        subtab = driver.find_element(By.ID, 'subtab_details')
-        subtab.click()
+    # Now, you can perform actions on the found element
+    # For example, click the link
+    element.click()
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.presence_of_element_located((By.ID, 'subtab_details')))
 
-        wait = WebDriverWait(driver, 10)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'row0')))
-        name_page_source = driver.page_source
-        name_soup = BeautifulSoup(name_page_source, 'html.parser')
-        name_row = name_soup.find('tr', class_='row0')
-        name = name_row.find('td')
-        nameList.append(name.text.strip())
-        print(nameList)
-        driver.back()
-        driver.back()
-        driver.execute_script("location.reload(true);")
+    subtab = driver.find_element(By.ID, 'subtab_details')
+    subtab.click()
+
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'row0')))
+    name_page_source = driver.page_source
+    name_soup = BeautifulSoup(name_page_source, 'html.parser')
+    name_row = name_soup.find('tr', class_='row0')
+    name = name_row.find('td')
+    nameList.append(name.text.strip())
+    print(nameList)
+    driver.back()
+    driver.back()
+    driver.execute_script("location.reload(true);")
 
     
 # for section in sections:
