@@ -57,7 +57,9 @@ for test1 in testing:
         wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'row0')))
         name_page_source = driver.page_source
         name_soup = BeautifulSoup(name_page_source, 'html.parser')
-        name = name_soup.find('tr', class_='row0')
+        name_row = name_soup.find('tr', class_='row0')
+        name = name_row.find('td')
+
         print(name)
         driver.back()
         driver.back()
