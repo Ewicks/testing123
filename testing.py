@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 import time
 import pprint
 
+addressList = []
+
 # Set up the WebDriver (you may need to provide the path to your chromedriver executable)
 driver = webdriver.Chrome()
 
@@ -16,30 +18,66 @@ driver.get(url)
 # Input start and end dates
 input_element1 = driver.find_element(By.ID, 'applicationReceivedStart')
 input_element2 = driver.find_element(By.ID, 'applicationReceivedEnd')
-input_element1.send_keys('01/01/2023')
-input_element2.send_keys('12/01/2023')
-time.sleep(5)
+input_element1.send_keys('01/01/2024')
+input_element2.send_keys('12/01/2024')
 # Click the search button
 search_element = driver.find_element(By.CLASS_NAME, 'recaptcha-submit')
 search_element.click()
-time.sleep(1)
 
 # Wait for the page to load (you may need to adjust the waiting time)
 wait = WebDriverWait(driver, 10)
 wait.until(EC.presence_of_element_located((By.ID, 'resultsPerPage')))
-print('i')
+
 # Get the page source after the search
 page_source = driver.page_source
-pprint.pprint(page_source)
 
 # Parse HTML with BeautifulSoup
 soup = BeautifulSoup(page_source, 'html.parser')
 
-# Locate and extract data (adjust this part based on your HTML structure)
-# Example: Extract text from all paragraphs with a specific class
-paragraphs = soup.find_all('div', class_='searchresult')
-for paragraph in paragraphs:
-    print(paragraph.text)
-time.sleep(20)
+sections = soup.find('div', class_='col-a')
+testing = sections.find_all('li', class_='searchresult')
+
+for test1 in testing:
+    a_tag = test1.find('a')
+
+    if a_tag:
+        link_text = a_tag.get_text(strip=True)
+        element = driver.find_element(By.LINK_TEXT, link_text)
+
+        # Now, you can perform actions on the found element
+        # For example, click the link
+        element.click()
+        wait = WebDriverWait(driver, 10)
+        wait.until(EC.presence_of_element_located((By.ID, 'subtab_details')))
+
+        subtab = driver.find_element(By.ID, 'subtab_details')
+        subtab.click()
+
+        wait = WebDriverWait(driver, 10)
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'row0')))
+        name_page_source = driver.page_source
+        name_soup = BeautifulSoup(name_page_source, 'html.parser')
+        name = name_soup.find('tr', class_='row0')
+        print(name)
+        driver.back()
+        driver.back()
+        driver.execute_script("location.reload(true);")
+
+    
+# for section in sections:
+#     print(section.get_text())
+
+
+# paragraphs = soup.find_all('p', class_='address')
+
+
+# for paragraph in paragraphs:
+#     addressList.append(paragraph.get_text().strip())
+    
+
+
+
+
+# print(addressList)
 # Close the browser window
 driver.quit()
