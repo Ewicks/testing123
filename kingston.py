@@ -27,10 +27,12 @@ words = convert(wordlist)
 words_search_for = words.rstrip(words[-1])
 print(words_search_for)
 
+# lists
+row_list = []
+address_list = []
+name_list = []
+data = []
 
-rowList = []
-addressList = []
-nameList = []
 
 # Set up the WebDriver (you may need to provide the path to your chromedriver executable)
 driver = webdriver.Chrome()
@@ -63,11 +65,16 @@ searchResults = searchResultsPage.find_all('li', class_='searchresult')
 for row in searchResults:
 
     if (re.search(words_search_for, row.text, flags=re.I)):
-        rowList.append(row)
+        row_list.append(row)
         
 
    
-for row in rowList:
+for row in row_list:
+    # Find the address and add to address_list
+    address_div = row.find('p', class_='address')
+    address = address_div.text.strip()
+    address_list.append(address)
+
     a_tag = row.find('a')
     link_text = a_tag.get_text(strip=True)
     element = driver.find_element(By.LINK_TEXT, link_text)
@@ -86,34 +93,26 @@ for row in rowList:
     wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'row0')))
     name_page_source = driver.page_source
-    name_soup = BeautifulSoup(name_page_source, 'html.parser')
-    name_rows = name_soup.find_all('tr', class_='row0')
+    info_soup = BeautifulSoup(name_page_source, 'html.parser')
+    name_rows = info_soup.find_all('tr', class_='row0')
+
     if len(name_rows) >= 3:
         name_row = name_rows[2]
     else: 
-        nameList.append('ERROR ------ STOP')
+        name_list.append('ERROR ------ STOP')
+
     name = name_row.find('td')
-    nameList.append(name.text.strip())
-    print(nameList)
+    name_list.append(name.text.strip())
     driver.back()
     driver.back()
     driver.execute_script("location.reload(true);")
 
-    
-# for section in sections:
-#     print(section.get_text())
+merge_data = zip(name_list, address_list)
 
+for item in merge_data:
+    data.append(item)
 
-# paragraphs = soup.find_all('p', class_='address')
+print(data)
 
-
-# for paragraph in paragraphs:
-#     addressList.append(paragraph.get_text().strip())
-    
-
-
-
-
-# print(addressList)
 # Close the browser window
 driver.quit()
