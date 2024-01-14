@@ -25,7 +25,6 @@ def convert(s):
 
 words = convert(wordlist)
 words_search_for = words.rstrip(words[-1])
-print(words_search_for)
 
 # lists
 row_list = []

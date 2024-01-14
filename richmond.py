@@ -1,9 +1,11 @@
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+from selenium.common.exceptions import TimeoutException
 import re
 import time
 import pprint
@@ -35,21 +37,49 @@ data = []
 # Set up the WebDriver (you may need to provide the path to your chromedriver executable)
 driver = webdriver.Chrome()
 
-url = 'https://caps.woking.gov.uk/online-applications/search.do?action=advanced'
+url = 'https://www2.richmond.gov.uk/lbrplanning/Planning_Report.aspx'
 driver.get(url)
 
 # Input start and end dates
-input_element1 = driver.find_element(By.ID, 'applicationReceivedStart')
-input_element2 = driver.find_element(By.ID, 'applicationReceivedEnd')
+input_element1 = driver.find_element(By.ID, 'ctl00_PageContent_dpValFrom')
+input_element2 = driver.find_element(By.ID, 'ctl00_PageContent_dpValTo')
 input_element1.send_keys('01/01/2024')
 input_element2.send_keys('12/01/2024')
 # Click the search button
-search_element = driver.find_element(By.CLASS_NAME, 'recaptcha-submit')
-search_element.click()
+search_element = driver.find_element(By.CLASS_NAME, 'btn-primary')
+# Wait for the cookie consent popup to appear
+wait = WebDriverWait(driver, 10)
+cookie_popup = wait.until(EC.presence_of_element_located((By.ID, 'ccc-end')))
 
+# Locate and click the "Accept" button
+print(cookie_popup)
+time.sleep(20)
+accept_button = cookie_popup.find_element(By.ID, 'ccc-dismiss-button')
+accept_button.click()
+time.sleep(4)
+
+  
+
+
+search_element.click()
+try:
+    # Wait for the cookie consent popup to appear
+    wait = WebDriverWait(driver, 10)
+    cookie_popup = wait.until(EC.presence_of_element_located((By.ID, 'cookie-popup')))
+
+    # Locate and click the "Accept" button
+    accept_button = cookie_popup.find_element(By.ID, 'accept-cookies')
+    accept_button.click()
+
+except TimeoutException:
+    # Cookie consent popup not found, proceed with your code
+    pass
 # Wait for the page to load (you may need to adjust the waiting time)
 wait = WebDriverWait(driver, 10)
-wait.until(EC.presence_of_element_located((By.ID, 'resultsPerPage')))
+wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'infocontent')))
+driver.execute_script("location.reload(true);")
+
+time.sleep(10)
 
 # Get the page source after the search
 page_source = driver.page_source
