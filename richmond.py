@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import Select
 import re
 import time
 import pprint
@@ -56,6 +57,7 @@ input_element2.send_keys('12/01/2024')
 # Click the search button
 search_element = driver.find_element(By.CLASS_NAME, 'btn-primary')
 
+
 # Wait for the cookie consent popup to appear
 wait = WebDriverWait(driver, 10)
 cookie_popup = wait.until(EC.presence_of_element_located((By.ID, 'ccc-end')))
@@ -64,13 +66,17 @@ cookie_popup = wait.until(EC.presence_of_element_located((By.ID, 'ccc-end')))
 accept_button = cookie_popup.find_element(By.ID, 'ccc-dismiss-button')
 accept_button.click()
 
+# Select 500 to show max results
+num_results_element = Select(driver.find_element(By.ID, 'ctl00_PageContent_ddLimit'))
+num_results_element.select_by_visible_text('500')
 
 # Click submit for advanced results page
 search_element.click()
 
 wait = WebDriverWait(driver, 10)
 wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'infocontent')))
-driver.execute_script("location.reload(true);")
+# driver.execute_script("location.reload(true);")
+# ctl00_PageContent_lbl_APPS
 
 
 # Get the page source after the search
@@ -78,6 +84,18 @@ page_source = driver.page_source
 
 # Parse HTML with BeautifulSoup
 soup = BeautifulSoup(page_source, 'html.parser')
+
+
+span_div = driver.find_element(By.ID, 'ctl00_PageContent_lbl_APPS')
+num_results = span_div.find_element(By.TAG_NAME, 'strong')
+
+if (int(num_results.text) > 500):
+    print('Results over 500 please alter your search results')
+    driver.quit()
+else:
+    print('Number of results for this search is: ' + num_results.text)
+
+
 
 searchResultsPage = soup.find('ul', class_='planning-apps')
 searchResults = searchResultsPage.find_all('li')
