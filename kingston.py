@@ -108,7 +108,6 @@ while (multiple_pages):
         wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'row0')))
         name_page_source = driver.page_source
         info_soup = BeautifulSoup(name_page_source, 'html.parser')
-        # name_rows = info_soup.find_all('tr', class_='row0')
 
         applicant_row = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.XPATH, '//th[text()="Applicant Name"]/following-sibling::td'))

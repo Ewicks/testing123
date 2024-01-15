@@ -89,15 +89,16 @@ for row in row_list:
     name_page_source = driver.page_source
     name_soup = BeautifulSoup(name_page_source, 'html.parser')
 
-    name_rows = name_soup.find_all('tr', class_='row0')
-    if len(name_rows) >= 3:
-        name_row = name_rows[2]
-        print(name_row)
-    else: 
-        name_list.append('ERROR ------ STOP')
-    
-    name = name_row.find('td')
-    name_list.append(name.text.strip())
+    applicant_row = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.XPATH, '//th[text()="Applicant Name"]/following-sibling::td'))
+    )
+
+    # Extract the "Applicant Name" text content
+    applicant_name_value = applicant_row.text if applicant_row else None
+    print(applicant_name_value)
+
+    name_list.append(applicant_name_value)
+    # name_list.append(name.text.strip())
     driver.back()
     driver.back()
     driver.execute_script("location.reload(true);")
