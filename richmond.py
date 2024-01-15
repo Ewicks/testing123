@@ -89,7 +89,7 @@ soup = BeautifulSoup(page_source, 'html.parser')
 span_div = driver.find_element(By.ID, 'ctl00_PageContent_lbl_APPS')
 num_results = span_div.find_element(By.TAG_NAME, 'strong')
 
-if (int(num_results.text) > 500):
+if (int(num_results.text) == 500):
     print('Results over 500 please alter your search results')
     driver.quit()
 else:
