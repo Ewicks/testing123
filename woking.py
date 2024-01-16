@@ -47,10 +47,12 @@ driver.get(url)
 input_element1 = driver.find_element(By.ID, 'applicationReceivedStart')
 input_element2 = driver.find_element(By.ID, 'applicationReceivedEnd')
 input_element1.send_keys('01/01/2024')
-input_element2.send_keys('12/01/2024')
+input_element2.send_keys('05/01/2024')
+
 # Click the search button
 search_element = driver.find_element(By.CLASS_NAME, 'recaptcha-submit')
 search_element.click()
+
 
 # Select 100 and submit to show max results
 num_results_element = Select(driver.find_element(By.ID, 'resultsPerPage'))
@@ -84,22 +86,22 @@ while (multiple_pages):
 
         if (re.search(words_search_for, address_desc, flags=re.I)):
             row_list.append(row)
+
     
     for row in row_list:
-
         # Find the address and add to address_list
         address_div = row.find('p', class_='address')
         address = address_div.text.strip()
         address_list.append(address)
-
         a_tag = row.find('a')
-        link_text = a_tag.get_text(strip=True)
-        element = driver.find_element(By.LINK_TEXT, link_text)
-
+        href_value = a_tag.get('href')
+        element = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, f"//a[@href='{href_value}']"))
+        )
         element.click()
+
         wait = WebDriverWait(driver, 10)
         wait.until(EC.presence_of_element_located((By.ID, 'subtab_details')))
-
         subtab = driver.find_element(By.ID, 'subtab_details')
         subtab.click()
 
@@ -108,19 +110,29 @@ while (multiple_pages):
         name_page_source = driver.page_source
         name_soup = BeautifulSoup(name_page_source, 'html.parser')
 
-        applicant_row = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '//th[text()="Applicant Name"]/following-sibling::td'))
-        )
 
-        # Extract the "Applicant Name" text content
-        applicant_name_value = applicant_row.text if applicant_row else None
-        print(applicant_name_value)
+      # Find the <td> element within the <tr> where the <th> has the specified text
+        applicant_name_tr = name_soup.find_all('tr', {'class': 'row0'})
 
-        name_list.append(applicant_name_value)
-    
+
+        for tr in applicant_name_tr:
+            tr_text = tr.text
+            if 'Applicant Name' in tr_text:
+                print('bingo')
+                td = tr.find('td')
+                if td is not None:
+                    name_list.append(td.text)
+                else:
+                    print('No Name')
+                    name_list.append('N/A')
+
+                # Reset the td variable for the next iteration
+                td = None
+        
         driver.back()
         driver.back()
         driver.execute_script("location.reload(true);")
+       
 
     try:
         next_a_tag = driver.find_element(By.CLASS_NAME, 'next')

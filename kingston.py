@@ -10,6 +10,8 @@ import re
 import time
 import pprint
 
+# bug: instead of searching for a tag name be more specific so if two rows have the same name it won duplicate.
+
 wordlist = ['rear']
 # wordlist = ['loft','ground','rear', 'erection']
 

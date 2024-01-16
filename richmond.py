@@ -13,7 +13,7 @@ import re
 import time
 import pprint
 
-wordlist = ['tree']
+wordlist = ['rear']
 
 # wordlist = ['loft','ground','rear']
 row_list = []
@@ -125,7 +125,6 @@ for row in row_list:
         subtab = None
         subtab = driver.find_element(By.ID, 'ctl00_PageContent_btnShowApplicantDetails')
     except:
-        print('no name')
         driver.back()
         name_list.append('n/a')
         continue
