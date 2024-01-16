@@ -44,8 +44,8 @@ driver.get(url)
 # Input start and end dates
 input_element1 = driver.find_element(By.ID, 'applicationReceivedStart')
 input_element2 = driver.find_element(By.ID, 'applicationReceivedEnd')
-input_element1.send_keys('20/12/2023')
-input_element2.send_keys('12/01/2024')
+input_element1.send_keys('01/01/2024')
+input_element2.send_keys('05/01/2024')
 # Click the search button
 search_element = driver.find_element(By.CLASS_NAME, 'recaptcha-submit')
 search_element.click()
@@ -78,10 +78,12 @@ while (multiple_pages):
     row_list = []
 
     for row in searchResults:
+        address_div = row.find('a')
+        address_desc = address_div.text
 
-        if (re.search(words_search_for, row.text, flags=re.I)):
+        if (re.search(words_search_for, address_desc, flags=re.I)):
             row_list.append(row)
-            
+
 
     for row in row_list:
         # Find the address and add to address_list
@@ -127,7 +129,6 @@ while (multiple_pages):
         # If the element is found, you can interact with it here
         multiple_pages = True
         next_a_tag.click()
-        time.sleep(10)
         
     except NoSuchElementException:
         # If the element is not found, handle the exception here

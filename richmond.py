@@ -178,11 +178,6 @@ for row in row_list:
         print('27')
         driver.back()
 
-
-
-
-
-
     print('9')
     driver.back()
 
