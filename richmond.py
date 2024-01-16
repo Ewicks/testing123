@@ -106,11 +106,6 @@ searchResults = searchResultsPage.find_all('li')
 for row in searchResults:
     address_divs = row.find_all('p')
     address_desc = address_divs[1].text
-    print(address_desc)
-    # for address_div in address_divs:
-    #     print(address_div.text.strip())
-    
-
 
     if (re.search(words_search_for, address_desc, flags=re.I)):
         row_list.append(row)
