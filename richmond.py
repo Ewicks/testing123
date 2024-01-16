@@ -16,6 +16,10 @@ import pprint
 wordlist = ['tree']
 
 # wordlist = ['loft','ground','rear']
+row_list = []
+address_list = []
+name_list = []
+data = []
 
 
 def convert(s):
@@ -30,20 +34,14 @@ def convert(s):
     # return string
     return new
 
-def format_address(addresss):
-    formatted_address = addresss.replace('\n', ' ')
+def format_address(address):
+    formatted_address = address.replace('\n', ' ')
     address_list.append(formatted_address)
 
 
 words = convert(wordlist)
 words_search_for = words.rstrip(words[-1])
-print(words_search_for)
 
-
-row_list = []
-address_list = []
-name_list = []
-data = []
 
 # Set up the WebDriver (you may need to provide the path to your chromedriver executable)
 driver = webdriver.Chrome()
@@ -109,76 +107,39 @@ for row in searchResults:
 
     if (re.search(words_search_for, address_desc, flags=re.I)):
         row_list.append(row)
-
-
    
-for row in row_list:
 
+for row in row_list:
     # Find the address and add to address_list
     address_div = row.find('h3')
     address = address_div.text.strip()
     format_address(address)
-    
+
+    a_tag = row.find('a')
+    link_text = a_tag.get_text(strip=True)
+    element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, link_text))
+        )
+    element.click()
     try:
-        a_tag = row.find('a')
-        link_text = a_tag.get_text(strip=True)
-        element = driver.find_element(By.LINK_TEXT, link_text)
-
-        element.click()
-        wait = WebDriverWait(driver, 10)
-        wait.until(EC.presence_of_element_located((By.ID, 'ctl00_PageContent_btnShowApplicantDetails')))
+        subtab = None
         subtab = driver.find_element(By.ID, 'ctl00_PageContent_btnShowApplicantDetails')
-       
-            
-        subtab.click()
-        wait = WebDriverWait(driver, 10)
-        wait.until(EC.presence_of_element_located((By.ID, 'ctl00_PageContent_lbl_Applic_Name')))
-        name_page_source = driver.page_source
-        name_soup = BeautifulSoup(name_page_source, 'html.parser')
-        name = name_soup.find('span', id='ctl00_PageContent_lbl_Applic_Name')
-        name_list.append(name.text.strip())
-
-    except TimeoutException:
-        print("Timed out waiting for element, but continuing with the script.")
-        name = 'None'
-        print('3')
-        name_list.append(name)
-        print('4')
-        print('5')
-
-    except NoSuchElementException:
-        print("Element with link text 'link_text' not found.")
-        name = 'None'
-        print('6')
-        name_list.append(name)
-        print('8')
-        print('7')
+    except:
+        print('no name')
         driver.back()
+        name_list.append('n/a')
+        continue
 
-      
+   
+    subtab.click()
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.presence_of_element_located((By.ID, 'ctl00_PageContent_lbl_Applic_Name')))
+    name_page_source = driver.page_source
+    name_soup = BeautifulSoup(name_page_source, 'html.parser')
+    name = name_soup.find('span', id='ctl00_PageContent_lbl_Applic_Name')
+    name_list.append(name.text.strip())
 
-    except Exception as e:
-        print("Element with link text 'link_text' not found.")
-        name = 'None'
-        print('16')
-        name_list.append(name)
-        print('18')
-
-        print('17')
-        driver.back()
-
-    else:
-        print("Element with link text 'link_text' not found.")
-        name = 'None'
-        print('26')
-        name_list.append(name)
-        print('28')
-
-        pass
-        print('27')
-        driver.back()
-
-    print('9')
+    driver.back()
     driver.back()
 
 
