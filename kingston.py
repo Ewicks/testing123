@@ -94,8 +94,10 @@ while (multiple_pages):
         address_list.append(address)
 
         a_tag = row.find('a')
-        link_text = a_tag.get_text(strip=True)
-        element = driver.find_element(By.LINK_TEXT, link_text)
+        href_value = a_tag.get('href')
+        element = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, f"//a[@href='{href_value}']"))
+        )
 
         # Now, you can perform actions on the found element
         # For example, click the link
