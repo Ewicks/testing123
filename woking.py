@@ -4,11 +4,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import Select
 
 from bs4 import BeautifulSoup
 import re
 import time
 import pprint
+
+# bug: the last name of in the list is a duplicate of the 2nd to last name in list 
 
 wordlist = ['rear']
 # wordlist = ['loft','ground','rear']
@@ -48,6 +51,12 @@ input_element2.send_keys('12/01/2024')
 # Click the search button
 search_element = driver.find_element(By.CLASS_NAME, 'recaptcha-submit')
 search_element.click()
+
+# Select 100 and submit to show max results
+num_results_element = Select(driver.find_element(By.ID, 'resultsPerPage'))
+num_results_element.select_by_visible_text('100')
+num_results_go = driver.find_element(By.CLASS_NAME, 'primary')
+num_results_go.click()
 
 next_a_tag = None
 multiple_pages = True
