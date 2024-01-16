@@ -13,7 +13,8 @@ import re
 import time
 import pprint
 
-wordlist = ['rear']
+wordlist = ['tree']
+
 # wordlist = ['loft','ground','rear']
 
 
@@ -36,6 +37,7 @@ def format_address(addresss):
 
 words = convert(wordlist)
 words_search_for = words.rstrip(words[-1])
+print(words_search_for)
 
 
 row_list = []
@@ -53,7 +55,7 @@ driver.get(url)
 input_element1 = driver.find_element(By.ID, 'ctl00_PageContent_dpValFrom')
 input_element2 = driver.find_element(By.ID, 'ctl00_PageContent_dpValTo')
 input_element1.send_keys('01/01/2024')
-input_element2.send_keys('12/01/2024')
+input_element2.send_keys('02/01/2024')
 # Click the search button
 search_element = driver.find_element(By.CLASS_NAME, 'btn-primary')
 
@@ -100,10 +102,19 @@ else:
 searchResultsPage = soup.find('ul', class_='planning-apps')
 searchResults = searchResultsPage.find_all('li')
 
+# search the description but append all rows with key words in description to row_list
 for row in searchResults:
+    address_divs = row.find_all('p')
+    address_desc = address_divs[1].text
+    print(address_desc)
+    # for address_div in address_divs:
+    #     print(address_div.text.strip())
+    
 
-    if (re.search(words_search_for, row.text, flags=re.I)):
+
+    if (re.search(words_search_for, address_desc, flags=re.I)):
         row_list.append(row)
+
 
    
 for row in row_list:
@@ -113,31 +124,71 @@ for row in row_list:
     address = address_div.text.strip()
     format_address(address)
     
-    
-    
+    try:
+        a_tag = row.find('a')
+        link_text = a_tag.get_text(strip=True)
+        element = driver.find_element(By.LINK_TEXT, link_text)
 
-    a_tag = row.find('a')
-    link_text = a_tag.get_text(strip=True)
-    element = driver.find_element(By.LINK_TEXT, link_text)
+        element.click()
+        wait = WebDriverWait(driver, 10)
+        wait.until(EC.presence_of_element_located((By.ID, 'ctl00_PageContent_btnShowApplicantDetails')))
+        subtab = driver.find_element(By.ID, 'ctl00_PageContent_btnShowApplicantDetails')
+       
+            
+        subtab.click()
+        wait = WebDriverWait(driver, 10)
+        wait.until(EC.presence_of_element_located((By.ID, 'ctl00_PageContent_lbl_Applic_Name')))
+        name_page_source = driver.page_source
+        name_soup = BeautifulSoup(name_page_source, 'html.parser')
+        name = name_soup.find('span', id='ctl00_PageContent_lbl_Applic_Name')
+        name_list.append(name.text.strip())
 
-    element.click()
-    wait = WebDriverWait(driver, 10)
-    wait.until(EC.presence_of_element_located((By.ID, 'ctl00_PageContent_btnShowApplicantDetails')))
+    except TimeoutException:
+        print("Timed out waiting for element, but continuing with the script.")
+        name = 'None'
+        print('3')
+        name_list.append(name)
+        print('4')
+        print('5')
 
-    subtab = driver.find_element(By.ID, 'ctl00_PageContent_btnShowApplicantDetails')
-    subtab.click()
+    except NoSuchElementException:
+        print("Element with link text 'link_text' not found.")
+        name = 'None'
+        print('6')
+        name_list.append(name)
+        print('8')
+        print('7')
+        driver.back()
 
-    wait = WebDriverWait(driver, 10)
-    wait.until(EC.presence_of_element_located((By.ID, 'ctl00_PageContent_lbl_Applic_Name')))
-    name_page_source = driver.page_source
-    name_soup = BeautifulSoup(name_page_source, 'html.parser')
+      
+
+    except Exception as e:
+        print("Element with link text 'link_text' not found.")
+        name = 'None'
+        print('16')
+        name_list.append(name)
+        print('18')
+
+        print('17')
+        driver.back()
+
+    else:
+        print("Element with link text 'link_text' not found.")
+        name = 'None'
+        print('26')
+        name_list.append(name)
+        print('28')
+
+        pass
+        print('27')
+        driver.back()
 
 
-    name = name_soup.find('span', id='ctl00_PageContent_lbl_Applic_Name')
-    
-    # name = name_rows.find('td')
-    name_list.append(name.text.strip())
-    driver.back()
+
+
+
+
+    print('9')
     driver.back()
 
 
